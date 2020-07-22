@@ -1,11 +1,10 @@
 import PageManager from './page-manager';
-import $ from 'jquery';
 import _ from 'lodash';
 import giftCertCheck from './common/gift-certificate-validator';
 import utils from '@bigcommerce/stencil-utils';
 import ShippingEstimator from './cart/shipping-estimator';
 import { defaultModal } from './global/modal';
-import swal from 'sweetalert2';
+import swal from './global/sweet-alert';
 
 export default class Cart extends PageManager {
     onReady() {
@@ -29,14 +28,14 @@ export default class Cart extends PageManager {
         const newQty = $target.data('action') === 'inc' ? oldQty + 1 : oldQty - 1;
         // Does not quality for min/max quantity
         if (newQty < minQty) {
-            return swal({
+            return swal.fire({
                 text: minError,
-                type: 'error',
+                icon: 'error',
             });
         } else if (maxQty > 0 && newQty > maxQty) {
-            return swal({
+            return swal.fire({
                 text: maxError,
-                type: 'error',
+                icon: 'error',
             });
         }
 
@@ -52,9 +51,9 @@ export default class Cart extends PageManager {
                 this.refreshContent(remove);
             } else {
                 $el.val(oldQty);
-                swal({
+                swal.fire({
                     text: response.data.errors.join('\n'),
-                    type: 'error',
+                    icon: 'error',
                 });
             }
         });
@@ -68,27 +67,28 @@ export default class Cart extends PageManager {
         const oldQty = preVal !== null ? preVal : minQty;
         const minError = $el.data('quantityMinError');
         const maxError = $el.data('quantityMaxError');
-        const newQty = parseInt(Number($el.attr('value')), 10);
+        const newQty = parseInt(Number($el.val()), 10);
         let invalidEntry;
+
         // Does not quality for min/max quantity
         if (!newQty) {
-            invalidEntry = $el.attr('value');
+            invalidEntry = $el.val();
             $el.val(oldQty);
-            return swal({
+            return swal.fire({
                 text: `${invalidEntry} is not a valid entry`,
-                type: 'error',
+                icon: 'error',
             });
         } else if (newQty < minQty) {
             $el.val(oldQty);
-            return swal({
+            return swal.fire({
                 text: minError,
-                type: 'error',
+                icon: 'error',
             });
         } else if (maxQty > 0 && newQty > maxQty) {
             $el.val(oldQty);
-            return swal({
+            return swal.fire({
                 text: maxError,
-                type: 'error',
+                icon: 'error',
             });
         }
 
@@ -103,9 +103,9 @@ export default class Cart extends PageManager {
                 this.refreshContent(remove);
             } else {
                 $el.val(oldQty);
-                swal({
+                swal.fire({
                     text: response.data.errors.join('\n'),
-                    type: 'error',
+                    icon: 'error',
                 });
             }
         });
@@ -117,9 +117,9 @@ export default class Cart extends PageManager {
             if (response.data.status === 'succeed') {
                 this.refreshContent(true);
             } else {
-                swal({
+                swal.fire({
                     text: response.data.errors.join('\n'),
-                    type: 'error',
+                    icon: 'error',
                 });
             }
         });
@@ -150,9 +150,9 @@ export default class Cart extends PageManager {
                 const data = result.data || {};
 
                 if (err) {
-                    swal({
+                    swal.fire({
                         text: err,
-                        type: 'error',
+                        icon: 'error',
                     });
                     return false;
                 }
@@ -227,7 +227,7 @@ export default class Cart extends PageManager {
         });
 
         // cart qty manually updates
-        $('.cart-item-qty-input', this.$cartContent).on('focus', () => {
+        $('.cart-item-qty-input', this.$cartContent).on('focus', function onQtyFocus() {
             preVal = this.value;
         }).change(event => {
             const $target = $(event.currentTarget);
@@ -240,13 +240,15 @@ export default class Cart extends PageManager {
         $('.cart-remove', this.$cartContent).on('click', event => {
             const itemId = $(event.currentTarget).data('cartItemid');
             const string = $(event.currentTarget).data('confirmDelete');
-            swal({
+            swal.fire({
                 text: string,
-                type: 'warning',
+                icon: 'warning',
                 showCancelButton: true,
-            }).then(() => {
-                // remove item from cart
-                cartRemoveItem(itemId);
+            }).then((result) => {
+                if (result.value) {
+                    // remove item from cart
+                    cartRemoveItem(itemId);
+                }
             });
             event.preventDefault();
         });
@@ -289,9 +291,9 @@ export default class Cart extends PageManager {
 
             // Empty code
             if (!code) {
-                return swal({
+                return swal.fire({
                     text: $codeInput.data('error'),
-                    type: 'error',
+                    icon: 'error',
                 });
             }
 
@@ -299,9 +301,9 @@ export default class Cart extends PageManager {
                 if (response.data.status === 'success') {
                     this.refreshContent();
                 } else {
-                    swal({
+                    swal.fire({
                         text: response.data.errors.join('\n'),
-                        type: 'error',
+                        icon: 'error',
                     });
                 }
             });
@@ -333,9 +335,9 @@ export default class Cart extends PageManager {
             event.preventDefault();
 
             if (!giftCertCheck(code)) {
-                return swal({
+                return swal.fire({
                     text: $certInput.data('error'),
-                    type: 'error',
+                    icon: 'error',
                 });
             }
 
@@ -343,9 +345,9 @@ export default class Cart extends PageManager {
                 if (resp.data.status === 'success') {
                     this.refreshContent();
                 } else {
-                    swal({
+                    swal.fire({
                         text: resp.data.errors.join('\n'),
-                        type: 'error',
+                        icon: 'error',
                     });
                 }
             });

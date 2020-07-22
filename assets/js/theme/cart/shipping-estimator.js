@@ -1,9 +1,8 @@
-import $ from 'jquery';
 import stateCountry from '../common/state-country';
 import nod from '../common/nod';
 import utils from '@bigcommerce/stencil-utils';
 import { Validators } from '../common/form-utils';
-import swal from 'sweetalert2';
+import swal from '../global/sweet-alert';
 
 export default class ShippingEstimator {
     constructor($element) {
@@ -101,9 +100,9 @@ export default class ShippingEstimator {
         // Requests the states for a country with AJAX
         stateCountry(this.$state, this.context, { useIdForStates: true }, (err, field) => {
             if (err) {
-                swal({
+                swal.fire({
                     text: err,
-                    type: 'error',
+                    icon: 'error',
                 });
 
                 throw new Error(err);
