@@ -1,59 +1,134 @@
 <!DOCTYPE html>
 <html class="no-js" lang="{{ locale_name }}">
     <head>
-        <title>{{ head.title }}</title>
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KH7P2ZR');</script>
+        <!-- End Google Tag Manager -->
+
+        <title>{{#if product.brand}}{{product.brand.name}}: {{/if}}{{ head.title }}</title>
         {{{ resourceHints }}}
         {{{ head.meta_tags }}}
         {{{ head.config }}}
+
+        <!-- Template Specific Head Tags -->
         {{#block "head"}} {{/block}}
 
         <link href="{{ head.favicon }}" rel="shortcut icon">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="canonical" href="https://organicstart.com" />
+        
+        <!--<meta property="ix:srcInputAttribute" content="ix-src">
+        <meta property="ix:pathInputAttribute" content="ix-path">
+        <meta property="ix:paramsInputAttribute" content="ix-params">
+        <meta property="ix:srcAttribute" content="data-src">
+        <meta property="ix:srcsetAttribute" content="data-srcset">
+        <meta property="ix:sizesAttribute" content="data-sizes">-->
+        <meta property="ix:host" content="triad.imgix.net">
+        <meta property="ix:useHttps" content="true">
 
-        <script>
-            {{!-- Change document class from no-js to js so we can detect this in css --}}
-            document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
-        </script>
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link href="https://www.googletagmanager.com" rel="preconnect" crossorigin>
+        <link href="https://cdn.jsdelivr.net" rel="preconnect" crossorigin>
+        <link href="https://cdnjs.cloudflare.com" rel="preconnect" crossorigin>
 
-        {{> components/common/polyfill-script }}
-
-        {{!-- Load Lazysizes script ASAP so images will appear --}}
-        <script>
-            {{!-- Only load visible elements until the onload event fires, after which preload nearby elements. --}}
-            window.lazySizesConfig = window.lazySizesConfig || {};
-            window.lazySizesConfig.loadMode = 1;
-        </script>
-        <script async src="{{cdn 'assets/dist/theme-bundle.head_async.js'}}"></script>
-
-        {{ getFontsCollection }}
+        <link href="https://fonts.googleapis.com/css?family=Fredoka+One:400|Nunito:300,400,600,700,800|Open+Sans:300,400,600&display=swap" rel="stylesheet">
+        {{#all (if template '!=' 'pages/home') (if template '!=' 'pages/category') (if template '!=' 'pages/product') (if template '!=' 'pages/brands') (if template '!=' 'pages/brand')}}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha384-ATvSpJEmy1egycrmomcFxVn4Z0A6rfjwlzDQrts/1QRerQhR9EEpEYtdysLpQPuQ" crossorigin="anonymous">
+        {{/all}}
         {{{stylesheet '/assets/css/theme.css'}}}
+        {{{stylesheet '/assets/dist/style.css'}}}
+
+        {{#block "styles"}} {{/block}}
+
+        <script>
+            document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+            window.lazySizesConfig = window.lazySizesConfig || {};
+            window.lazySizesConfig.init = false;
+        </script>
 
         {{{head.scripts}}}
+        {{{head.rsslinks}}}
 
-        {{~inject 'themeSettings' theme_settings}}
-        {{~inject 'genericError' (lang 'common.generic_error')}}
-        {{~inject 'maintenanceModeSettings' settings.maintenance}}
-        {{~inject 'adminBarLanguage' (langJson 'admin')}}
-        {{~inject 'urls' urls}}
-        {{~inject 'secureBaseUrl' settings.secure_base_url}}
-        {{~inject 'cartId' cart_id}}
-        {{~inject 'channelId' settings.channel_id}}
-        {{~inject 'template' template}}
+        {{inject 'themeSettings' theme_settings}}
+        {{inject 'genericError' (lang 'common.generic_error')}}
+        {{inject 'maintenanceMode' settings.maintenance}}
+        {{inject 'urls' urls}}
+        {{inject 'secureBaseUrl' settings.secure_base_url}}
+        {{inject 'cartId' cart_id}}
+        {{inject 'template' template}}
+        {{{snippet 'htmlhead'}}}
     </head>
     <body>
-        <svg data-src="{{cdn 'img/icon-sprite.svg'}}" class="icons-svg-sprite"></svg>
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KH7P2ZR"
+            height="0" width="0" style="display:none;visibility:h6idden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+        
+        {{{snippet 'header'}}}
 
-        {{> components/common/header }}
-        {{> components/common/body }}
-        {{> components/common/footer }}
+        {{> os/components/common/symbols}}
+
+        {{#and settings.privacy_cookie settings.is_eu_ip_address}}
+            {{> components/common/cookie}}
+        {{/and}}
+        
+        <div id="tint"></div>
+
+        {{> os/components/cart/sidebar}}
+
+        {{> os/components/common/navigation/navigation-mobile}}
+
+        {{> os/components/common/banner }}
+
+        {{> os/components/common/logo }}
+
+        {{> os/components/common/header }}
+        <div id="wrapper" data-currency-code="{{currency_selector.active_currency_code}}">
+            <main id="body">
+                {{#block "header"}} {{/block}}
+
+                {{> os/components/common/body }}
+            </main>
+            {{> os/components/common/footer }}
+        </div>
 
         <script>window.__webpack_public_path__ = "{{cdn 'assets/dist/'}}";</script>
         <script src="{{cdn 'assets/dist/theme-bundle.main.js'}}"></script>
+
         <script>
-            {{!-- Exported in app.js --}}
+            // Exported in app.js
             window.stencilBootstrap("{{page_type}}", {{jsContext}}).load();
         </script>
 
+        {{#block "scripts"}} {{/block}}
+
         {{{footer.scripts}}}
+        
+        {{{snippet 'footer'}}}
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" defer></script>
+        <script>
+            lazySizes.init();
+        </script>
+        <!-- Start of organicstarthelp Zendesk Widget script -->
+        <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=8d4a8b0b-7159-4f55-bb59-b2cfe674300f"> </script>
+        <!-- End of organicstarthelp Zendesk Widget script -->
+        <script type="text/javascript">
+            var _userway_config = {
+            account: 'q6ONF7lmJj'
+            };
+        </script>
+        <script type="text/javascript" src="https://cdn.userway.org/widget.js"></script>
+        <style>
+            #___ratingbadge_0 {
+                z-index: 2!important;
+                bottom: 100px!important;
+            }
+        </style>
     </body>
 </html>
